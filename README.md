@@ -1,3 +1,3 @@
 # Mef X Roslyn
 
-Experimentations on creating MEF plugins as scripts
+Experiments on creating MEF plugins as scripts
