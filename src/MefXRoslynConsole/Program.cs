@@ -24,7 +24,7 @@ namespace MefXRoslynConsole
         {
             platformAssemblies = AppContext.GetData("TRUSTED_PLATFORM_ASSEMBLIES")
                 .ToString()
-                .Split(RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? ';' : ':')
+                .Split(Path.PathSeparator)
                 .Select(x => (MetadataReference)MetadataReference.CreateFromFile(x))
                 .ToList();
 
