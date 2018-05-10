@@ -5,7 +5,6 @@ using System.ComponentModel.Composition.Hosting;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Runtime.InteropServices;
 using System.Text;
 using MefXRoslynLibrary;
 using Microsoft.CodeAnalysis;
@@ -22,11 +21,21 @@ namespace MefXRoslynConsole
 
         private Program()
         {
-            platformAssemblies = AppContext.GetData("TRUSTED_PLATFORM_ASSEMBLIES")
-                .ToString()
-                .Split(Path.PathSeparator)
-                .Select(x => (MetadataReference)MetadataReference.CreateFromFile(x))
-                .ToList();
+            var trustedPlatformAssemblies = AppContext.GetData("TRUSTED_PLATFORM_ASSEMBLIES");
+            if (trustedPlatformAssemblies != null)
+            {
+                platformAssemblies = trustedPlatformAssemblies
+                    .ToString()
+                    .Split(Path.PathSeparator)
+                    .Where(t => t.Contains("mscorlib.dll") || t.Contains("System.Runtime.dll") || t.Contains("System.Private.CoreLib.dll"))
+                    .Select(x => (MetadataReference)MetadataReference.CreateFromFile(x))
+                    .ToList();
+            }
+            else
+            {
+                MetadataReference mscorlib = MetadataReference.CreateFromFile(typeof(object).Assembly.Location);
+                platformAssemblies = new List<MetadataReference> { mscorlib };
+            }
 
             MetadataReference mefScriptConsole = MetadataReference.CreateFromFile(typeof(IPlugin).Assembly.Location);
             MetadataReference systemComponentModelComposition = MetadataReference.CreateFromFile(typeof(ExportAttribute).Assembly.Location);
