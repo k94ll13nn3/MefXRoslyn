@@ -27,7 +27,7 @@ namespace MefXRoslynConsole
                 platformAssemblies = trustedPlatformAssemblies
                     .ToString()
                     .Split(Path.PathSeparator)
-                    .Where(t => t.Contains("mscorlib.dll") || t.Contains("System.Runtime.dll") || t.Contains("System.Private.CoreLib.dll"))
+                    .Where(t => t.Contains("System.Runtime.dll") || t.Contains("System.Private.CoreLib.dll"))
                     .Select(x => (MetadataReference)MetadataReference.CreateFromFile(x))
                     .ToList();
             }
@@ -94,7 +94,7 @@ namespace MefXRoslynConsole
             text.Append("using MefXRoslynLibrary;");
             text.Append(File.ReadAllText(path));
 
-            SyntaxTree tree = CSharpSyntaxTree.ParseText(text.ToString());
+            SyntaxTree tree = CSharpSyntaxTree.ParseText(text.ToString(), new CSharpParseOptions(languageVersion: LanguageVersion.Latest));
 
             var options = new CSharpCompilationOptions(
                 OutputKind.DynamicallyLinkedLibrary,
