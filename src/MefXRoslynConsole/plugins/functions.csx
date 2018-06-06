@@ -2,7 +2,11 @@
 [ExportMetadata("Symbol", '+')]
 class Add : IFunction
 {
-    public int Operate(int left, int right) => new Adder().Add((left, right));
+    public int Operate(int left, int right)
+    {
+        var a = 0;
+        return new Adder().Add((left, right));
+    }
 }
 
 [Export(typeof(IFunction))]

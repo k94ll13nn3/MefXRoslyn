@@ -108,13 +108,13 @@ namespace MefXRoslynConsole
 
             var memoryStream = new MemoryStream();
             EmitResult emitResult = compilation.Emit(memoryStream);
+            foreach (Diagnostic diagnostic in emitResult.Diagnostics)
+            {
+                PrintDiagnostic(diagnostic);
+            }
+
             if (!emitResult.Success)
             {
-                foreach (Diagnostic item in emitResult.Diagnostics)
-                {
-                    Console.WriteLine(item);
-                }
-
                 return null;
             }
             else
@@ -130,6 +130,29 @@ namespace MefXRoslynConsole
 
                 return assembly;
             }
+        }
+
+        private void PrintDiagnostic(Diagnostic diagnostic)
+        {
+            var defaultForegroundColor = Console.ForegroundColor;
+            var newForegroundColor = defaultForegroundColor;
+            switch (diagnostic.Severity)
+            {
+                case DiagnosticSeverity.Info:
+                    newForegroundColor = ConsoleColor.Cyan;
+                    break;
+
+                case DiagnosticSeverity.Warning:
+                    newForegroundColor = ConsoleColor.Yellow;
+                    break;
+
+                case DiagnosticSeverity.Error:
+                    newForegroundColor = ConsoleColor.Red;
+                    break;
+            }
+            Console.ForegroundColor = newForegroundColor;
+            Console.WriteLine(diagnostic);
+            Console.ForegroundColor = defaultForegroundColor;
         }
     }
 }

@@ -10,7 +10,6 @@
 
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
     <Exec Command="copy /Y &quot;$(TargetDir)$(ProjectName).dll&quot; &quot;$(SolutionDir)\MefXRoslynConsole\bin\Debug\netcoreapp2.1\plugins&quot;" />
-    <Exec Command="copy /Y &quot;$(TargetDir)$(ProjectName).dll&quot; &quot;$(SolutionDir)\MefXRoslynConsole\bin\Debug\net472\plugins&quot;" />
   </Target>
 
   
