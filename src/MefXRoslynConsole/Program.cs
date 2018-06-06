@@ -21,21 +21,12 @@ namespace MefXRoslynConsole
 
         private Program()
         {
-            var trustedPlatformAssemblies = AppContext.GetData("TRUSTED_PLATFORM_ASSEMBLIES");
-            if (trustedPlatformAssemblies != null)
-            {
-                platformAssemblies = trustedPlatformAssemblies
-                    .ToString()
-                    .Split(Path.PathSeparator)
-                    .Where(t => t.Contains("System.Runtime.dll") || t.Contains("System.Private.CoreLib.dll"))
-                    .Select(x => (MetadataReference)MetadataReference.CreateFromFile(x))
-                    .ToList();
-            }
-            else
-            {
-                MetadataReference mscorlib = MetadataReference.CreateFromFile(typeof(object).Assembly.Location);
-                platformAssemblies = new List<MetadataReference> { mscorlib };
-            }
+            platformAssemblies = AppContext.GetData("TRUSTED_PLATFORM_ASSEMBLIES")
+                .ToString()
+                .Split(Path.PathSeparator)
+                .Where(t => t.Contains("System.Runtime.dll") || t.Contains("System.Private.CoreLib.dll"))
+                .Select(x => (MetadataReference)MetadataReference.CreateFromFile(x))
+                .ToList();
 
             MetadataReference mefScriptConsole = MetadataReference.CreateFromFile(typeof(IPlugin).Assembly.Location);
             MetadataReference systemComponentModelComposition = MetadataReference.CreateFromFile(typeof(ExportAttribute).Assembly.Location);
@@ -94,7 +85,7 @@ namespace MefXRoslynConsole
             text.Append("using MefXRoslynLibrary;");
             text.Append(File.ReadAllText(path));
 
-            SyntaxTree tree = CSharpSyntaxTree.ParseText(text.ToString(), new CSharpParseOptions(languageVersion: LanguageVersion.Latest));
+            SyntaxTree tree = CSharpSyntaxTree.ParseText(text.ToString(), new CSharpParseOptions(languageVersion: LanguageVersion.Latest, kind: SourceCodeKind.Regular));
 
             var options = new CSharpCompilationOptions(
                 OutputKind.DynamicallyLinkedLibrary,
@@ -106,36 +97,38 @@ namespace MefXRoslynConsole
                 platformAssemblies,
                 options);
 
-            var memoryStream = new MemoryStream();
-            EmitResult emitResult = compilation.Emit(memoryStream);
-            foreach (Diagnostic diagnostic in emitResult.Diagnostics)
+            using (var memoryStream = new MemoryStream())
             {
-                PrintDiagnostic(diagnostic);
-            }
-
-            if (!emitResult.Success)
-            {
-                return null;
-            }
-            else
-            {
-                // Cannot load into another AppDomain in .NET Core
-                var assembly = Assembly.Load(memoryStream.ToArray());
-                foreach (Type type in assembly.GetTypes())
+                EmitResult emitResult = compilation.Emit(memoryStream);
+                foreach (Diagnostic diagnostic in emitResult.Diagnostics)
                 {
-                    Console.WriteLine($"Loaded type {type.FullName}.");
+                    PrintDiagnostic(diagnostic);
                 }
 
-                Console.Write(Environment.NewLine);
+                if (!emitResult.Success)
+                {
+                    return null;
+                }
+                else
+                {
+                    // Cannot load into another AppDomain in .NET Core
+                    var assembly = Assembly.Load(memoryStream.ToArray());
+                    foreach (Type type in assembly.GetTypes())
+                    {
+                        Console.WriteLine($"Loaded type {type.FullName}.");
+                    }
 
-                return assembly;
+                    Console.Write(Environment.NewLine);
+
+                    return assembly;
+                }
             }
         }
 
         private void PrintDiagnostic(Diagnostic diagnostic)
         {
-            var defaultForegroundColor = Console.ForegroundColor;
-            var newForegroundColor = defaultForegroundColor;
+            ConsoleColor defaultForegroundColor = Console.ForegroundColor;
+            ConsoleColor newForegroundColor = defaultForegroundColor;
             switch (diagnostic.Severity)
             {
                 case DiagnosticSeverity.Info:
@@ -150,6 +143,7 @@ namespace MefXRoslynConsole
                     newForegroundColor = ConsoleColor.Red;
                     break;
             }
+
             Console.ForegroundColor = newForegroundColor;
             Console.WriteLine(diagnostic);
             Console.ForegroundColor = defaultForegroundColor;
