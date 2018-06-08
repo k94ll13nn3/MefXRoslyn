@@ -24,15 +24,12 @@ namespace MefXRoslynConsole
             platformAssemblies = AppContext.GetData("TRUSTED_PLATFORM_ASSEMBLIES")
                 .ToString()
                 .Split(Path.PathSeparator)
-                .Where(t => t.Contains("System.Runtime.dll") || t.Contains("System.Private.CoreLib.dll"))
+                .Where(t => t.Contains("System.Runtime.dll") || t.Contains("System.Private.CoreLib.dll") || t.Contains("System.Console.dll"))
                 .Select(x => (MetadataReference)MetadataReference.CreateFromFile(x))
                 .ToList();
 
-            MetadataReference mefScriptConsole = MetadataReference.CreateFromFile(typeof(IPlugin).Assembly.Location);
-            MetadataReference systemComponentModelComposition = MetadataReference.CreateFromFile(typeof(ExportAttribute).Assembly.Location);
-
-            platformAssemblies.Add(mefScriptConsole);
-            platformAssemblies.Add(systemComponentModelComposition);
+            platformAssemblies.Add(MetadataReference.CreateFromFile(typeof(IPlugin).Assembly.Location));
+            platformAssemblies.Add(MetadataReference.CreateFromFile(typeof(ExportAttribute).Assembly.Location));
 
             var catalog = new AggregateCatalog();
             catalog.Catalogs.Add(new AssemblyCatalog(Assembly.GetExecutingAssembly()));
@@ -85,17 +82,20 @@ namespace MefXRoslynConsole
             text.Append("using MefXRoslynLibrary;");
             text.Append(File.ReadAllText(path));
 
-            SyntaxTree tree = CSharpSyntaxTree.ParseText(text.ToString(), new CSharpParseOptions(languageVersion: LanguageVersion.Latest, kind: SourceCodeKind.Regular));
+            var parseOptions = new CSharpParseOptions(
+                languageVersion: LanguageVersion.Latest,
+                kind: SourceCodeKind.Regular);
 
-            var options = new CSharpCompilationOptions(
+            var compilationOptions = new CSharpCompilationOptions(
                 OutputKind.DynamicallyLinkedLibrary,
                 optimizationLevel: OptimizationLevel.Release);
 
+            SyntaxTree tree = CSharpSyntaxTree.ParseText(text.ToString(), parseOptions);
             var compilation = CSharpCompilation.Create(
                 Path.GetFileNameWithoutExtension(path),
                 new[] { tree },
                 platformAssemblies,
-                options);
+                compilationOptions);
 
             using (var memoryStream = new MemoryStream())
             {
