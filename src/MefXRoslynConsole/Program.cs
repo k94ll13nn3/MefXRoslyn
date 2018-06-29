@@ -17,19 +17,21 @@ namespace MefXRoslynConsole
     {
         private readonly string pluginPath = Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), "plugins");
 
-        private List<MetadataReference> platformAssemblies;
+        private IReadOnlyCollection<MetadataReference> platformAssemblies;
 
         private Program()
         {
-            platformAssemblies = AppContext.GetData("TRUSTED_PLATFORM_ASSEMBLIES")
+            var tmpPlatformAssemblies = AppContext.GetData("TRUSTED_PLATFORM_ASSEMBLIES")
                 .ToString()
                 .Split(Path.PathSeparator)
                 .Where(t => t.Contains("System.Runtime.dll") || t.Contains("System.Private.CoreLib.dll") || t.Contains("System.Console.dll"))
                 .Select(x => (MetadataReference)MetadataReference.CreateFromFile(x))
                 .ToList();
 
-            platformAssemblies.Add(MetadataReference.CreateFromFile(typeof(IPlugin).Assembly.Location));
-            platformAssemblies.Add(MetadataReference.CreateFromFile(typeof(ExportAttribute).Assembly.Location));
+            tmpPlatformAssemblies.Add(MetadataReference.CreateFromFile(typeof(IPlugin).Assembly.Location));
+            tmpPlatformAssemblies.Add(MetadataReference.CreateFromFile(typeof(ExportAttribute).Assembly.Location));
+
+            platformAssemblies = tmpPlatformAssemblies.AsReadOnly();
 
             var catalog = new AggregateCatalog();
             catalog.Catalogs.Add(new AssemblyCatalog(Assembly.GetExecutingAssembly()));
@@ -80,7 +82,9 @@ namespace MefXRoslynConsole
             var text = new StringBuilder();
             text.Append("using System.ComponentModel.Composition;");
             text.Append("using MefXRoslynLibrary;");
-            text.Append(File.ReadAllText(path));
+
+            var lines = File.ReadAllLines(path);
+            text.AppendJoin("", lines.Where(x => !x.StartsWith("#r")));
 
             var parseOptions = new CSharpParseOptions(
                 languageVersion: LanguageVersion.Latest,
@@ -90,11 +94,14 @@ namespace MefXRoslynConsole
                 OutputKind.DynamicallyLinkedLibrary,
                 optimizationLevel: OptimizationLevel.Release);
 
+            var assemblies = platformAssemblies.ToList();
+            assemblies.AddRange(lines.Where(x => x.StartsWith("#r")).Select(x => (MetadataReference)MetadataReference.CreateFromFile(x.Substring(4, x.Length - 5))));
+
             SyntaxTree tree = CSharpSyntaxTree.ParseText(text.ToString(), parseOptions);
             var compilation = CSharpCompilation.Create(
                 Path.GetFileNameWithoutExtension(path),
                 new[] { tree },
-                platformAssemblies,
+                assemblies,
                 compilationOptions);
 
             using (var memoryStream = new MemoryStream())
@@ -125,7 +132,7 @@ namespace MefXRoslynConsole
             }
         }
 
-        private void PrintDiagnostic(Diagnostic diagnostic)
+        private static void PrintDiagnostic(Diagnostic diagnostic)
         {
             ConsoleColor defaultForegroundColor = Console.ForegroundColor;
             ConsoleColor newForegroundColor = defaultForegroundColor;

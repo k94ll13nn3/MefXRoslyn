@@ -3,11 +3,13 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.26124.0
 MinimumVisualStudioVersion = 15.0.26124.0
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MefXRoslynConsole", "MefXRoslynConsole\MefXRoslynConsole.csproj", "{94DE0957-B4B1-486B-A66C-AD4D8AD1D6C0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MefXRoslynConsole", "MefXRoslynConsole\MefXRoslynConsole.csproj", "{94DE0957-B4B1-486B-A66C-AD4D8AD1D6C0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MefXRoslynLibrary", "MefXRoslynLibrary\MefXRoslynLibrary.csproj", "{E8203658-880B-46DF-BDA5-D6AE79BF9989}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MefXRoslynLibrary", "MefXRoslynLibrary\MefXRoslynLibrary.csproj", "{E8203658-880B-46DF-BDA5-D6AE79BF9989}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MefXRoslynPlugin", "MefXRoslynPlugin\MefXRoslynPlugin.csproj", "{9ED6B589-BD3F-4218-8DEA-1811FA9EB7DE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MefXRoslynPlugin", "MefXRoslynPlugin\MefXRoslynPlugin.csproj", "{9ED6B589-BD3F-4218-8DEA-1811FA9EB7DE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MefXRoslynRandomAssembly", "MefXRoslynRandomAssembly\MefXRoslynRandomAssembly.csproj", "{494C610B-B82E-4D7A-A180-2E45CA16D414}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -17,9 +19,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 		Release|x64 = Release|x64
 		Release|x86 = Release|x86
-	EndGlobalSection
-	GlobalSection(SolutionProperties) = preSolution
-		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{94DE0957-B4B1-486B-A66C-AD4D8AD1D6C0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
@@ -58,5 +57,23 @@ Global
 		{9ED6B589-BD3F-4218-8DEA-1811FA9EB7DE}.Release|x64.Build.0 = Release|Any CPU
 		{9ED6B589-BD3F-4218-8DEA-1811FA9EB7DE}.Release|x86.ActiveCfg = Release|Any CPU
 		{9ED6B589-BD3F-4218-8DEA-1811FA9EB7DE}.Release|x86.Build.0 = Release|Any CPU
+		{494C610B-B82E-4D7A-A180-2E45CA16D414}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{494C610B-B82E-4D7A-A180-2E45CA16D414}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{494C610B-B82E-4D7A-A180-2E45CA16D414}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{494C610B-B82E-4D7A-A180-2E45CA16D414}.Debug|x64.Build.0 = Debug|Any CPU
+		{494C610B-B82E-4D7A-A180-2E45CA16D414}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{494C610B-B82E-4D7A-A180-2E45CA16D414}.Debug|x86.Build.0 = Debug|Any CPU
+		{494C610B-B82E-4D7A-A180-2E45CA16D414}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{494C610B-B82E-4D7A-A180-2E45CA16D414}.Release|Any CPU.Build.0 = Release|Any CPU
+		{494C610B-B82E-4D7A-A180-2E45CA16D414}.Release|x64.ActiveCfg = Release|Any CPU
+		{494C610B-B82E-4D7A-A180-2E45CA16D414}.Release|x64.Build.0 = Release|Any CPU
+		{494C610B-B82E-4D7A-A180-2E45CA16D414}.Release|x86.ActiveCfg = Release|Any CPU
+		{494C610B-B82E-4D7A-A180-2E45CA16D414}.Release|x86.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {AE477D34-825E-4076-B35A-151A8E04781C}
 	EndGlobalSection
 EndGlobal
